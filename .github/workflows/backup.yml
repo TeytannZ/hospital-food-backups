@@ -1,0 +1,67 @@
+name: Nightly Data Backup
+
+on:
+  schedule:
+    # Runs every night at 02:00 UTC (adjust to your timezone)
+    - cron: '0 2 * * *'
+  workflow_dispatch: # Allow manual trigger from GitHub UI
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout backup repo
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.BACKUP_TOKEN }}
+
+      - name: Export data from app
+        run: |
+          # Login to get token
+          RESPONSE=$(curl -s -X POST "${{ secrets.APP_URL }}/api/auth/login" \
+            -H "Content-Type: application/json" \
+            -d '{"username":"${{ secrets.BACKUP_USER }}","password":"${{ secrets.BACKUP_PASS }}"}')
+          TOKEN=$(echo $RESPONSE | python3 -c "import sys,json; print(json.load(sys.stdin)['token'])" 2>/dev/null)
+
+          if [ -z "$TOKEN" ]; then
+            echo "Login failed — check APP_URL, BACKUP_USER, BACKUP_PASS secrets"
+            exit 1
+          fi
+
+          # Fetch full export (records + catalog + audit logs)
+          curl -s -H "Authorization: Bearer $TOKEN" \
+            "${{ secrets.APP_URL }}/api/users/audit/export" \
+            -o audit_raw.json
+
+          # Build backup filename with today's date
+          DATE=$(date +%Y-%m-%d)
+          BACKUP_DIR="backups/$DATE"
+          mkdir -p $BACKUP_DIR
+
+          # Export records
+          curl -s -H "Authorization: Bearer $TOKEN" \
+            "${{ secrets.APP_URL }}/api/records" \
+            -o $BACKUP_DIR/records_list.json
+
+          # Export catalog
+          curl -s -H "Authorization: Bearer $TOKEN" \
+            "${{ secrets.APP_URL }}/api/users/catalog" \
+            -o $BACKUP_DIR/catalog.json
+
+          # Export audit logs
+          curl -s -H "Authorization: Bearer $TOKEN" \
+            "${{ secrets.APP_URL }}/api/users/audit/export" \
+            -o $BACKUP_DIR/audit_logs.json
+
+          echo "{ \"backed_up_at\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\", \"source\": \"${{ secrets.APP_URL }}\" }" \
+            > $BACKUP_DIR/metadata.json
+
+          echo "Backup saved to $BACKUP_DIR"
+
+      - name: Commit backup
+        run: |
+          git config user.name "Backup Bot"
+          git config user.email "backup@hospital-food-tracker"
+          git add backups/
+          git diff --cached --quiet || git commit -m "Auto-backup $(date +%Y-%m-%d)"
+          git push
