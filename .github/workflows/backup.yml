@@ -1,9 +1,8 @@
 name: Nightly Data Backup
-
 on:
   schedule:
-    - cron: '0 2 * * *'   # Every night at 02:00 UTC
-  workflow_dispatch:         # Also run manually from GitHub Actions tab
+    - cron: '0 2 * * *'
+  workflow_dispatch:
 
 jobs:
   backup:
@@ -23,15 +22,24 @@ jobs:
           BACKUP_USER: ${{ secrets.BACKUP_USER }}
           BACKUP_PASS: ${{ secrets.BACKUP_PASS }}
         run: |
+          APP_URL="${APP_URL%/}"
+
           LOGIN=$(curl -s -X POST "${APP_URL}/api/auth/login" \
             -H "Content-Type: application/json" \
             -d "{\"username\":\"${BACKUP_USER}\",\"password\":\"${BACKUP_PASS}\"}")
 
-          TOKEN=$(echo "$LOGIN" | jq -r '.token // empty')
+          echo "Login response: $LOGIN"
 
+          if ! echo "$LOGIN" | jq . > /dev/null 2>&1; then
+            echo "ERROR: Login endpoint did not return valid JSON."
+            echo "Check that APP_URL is correct and the server is reachable."
+            exit 1
+          fi
+
+          TOKEN=$(echo "$LOGIN" | jq -r '.token // empty')
           if [ -z "$TOKEN" ]; then
-            echo "Login failed. Response: $LOGIN"
-            echo "Check APP_URL, BACKUP_USER, BACKUP_PASS secrets."
+            echo "Login failed — valid JSON but no token found."
+            echo "Response was: $LOGIN"
             exit 1
           fi
 
@@ -41,10 +49,8 @@ jobs:
 
           curl -sf -H "Authorization: Bearer $TOKEN" \
             "${APP_URL}/api/records" -o "$BACKUP_DIR/records_list.json"
-
           curl -sf -H "Authorization: Bearer $TOKEN" \
             "${APP_URL}/api/users/catalog" -o "$BACKUP_DIR/catalog.json"
-
           curl -sf -H "Authorization: Bearer $TOKEN" \
             "${APP_URL}/api/users/audit/export" -o "$BACKUP_DIR/audit_logs.json" || true
 
