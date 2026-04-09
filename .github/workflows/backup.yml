@@ -3,7 +3,6 @@ on:
   schedule:
     - cron: '0 2 * * *'
   workflow_dispatch:
-
 jobs:
   backup:
     runs-on: ubuntu-latest
@@ -23,39 +22,49 @@ jobs:
           BACKUP_PASS: ${{ secrets.BACKUP_PASS }}
         run: |
           APP_URL="${APP_URL%/}"
-
           LOGIN=$(curl -s -X POST "${APP_URL}/api/auth/login" \
             -H "Content-Type: application/json" \
             -d "{\"username\":\"${BACKUP_USER}\",\"password\":\"${BACKUP_PASS}\"}")
-
           echo "Login response: $LOGIN"
-
           if ! echo "$LOGIN" | jq . > /dev/null 2>&1; then
             echo "ERROR: Login endpoint did not return valid JSON."
             echo "Check that APP_URL is correct and the server is reachable."
             exit 1
           fi
-
           TOKEN=$(echo "$LOGIN" | jq -r '.token // empty')
           if [ -z "$TOKEN" ]; then
             echo "Login failed — valid JSON but no token found."
             echo "Response was: $LOGIN"
             exit 1
           fi
-
           DATE=$(date +%Y-%m-%d)
           BACKUP_DIR="backups/$DATE"
           mkdir -p "$BACKUP_DIR"
-
           curl -sf -H "Authorization: Bearer $TOKEN" \
             "${APP_URL}/api/records" -o "$BACKUP_DIR/records_list.json"
           curl -sf -H "Authorization: Bearer $TOKEN" \
             "${APP_URL}/api/users/catalog" -o "$BACKUP_DIR/catalog.json"
           curl -sf -H "Authorization: Bearer $TOKEN" \
             "${APP_URL}/api/users/audit/export" -o "$BACKUP_DIR/audit_logs.json" || true
-
           echo "{\"backed_up_at\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\",\"source\":\"${APP_URL}\"}" \
             > "$BACKUP_DIR/metadata.json"
+
+      - name: Delete backups older than 30 days
+        run: |
+          # Keep only the 30 most recent backup folders
+          if [ -d "backups" ]; then
+            BACKUP_COUNT=$(ls -1 backups/ | grep -E '^[0-9]{4}-[0-9]{2}-[0-9]{2}$' | wc -l)
+            echo "Total backups before cleanup: $BACKUP_COUNT"
+            if [ "$BACKUP_COUNT" -gt 30 ]; then
+              ls -1 backups/ | grep -E '^[0-9]{4}-[0-9]{2}-[0-9]{2}$' | sort | head -n $(($BACKUP_COUNT - 30)) | while read old_dir; do
+                echo "Deleting old backup: $old_dir"
+                rm -rf "backups/$old_dir"
+              done
+              echo "Cleanup done. Kept 30 most recent backups."
+            else
+              echo "No cleanup needed ($BACKUP_COUNT backups, limit is 30)."
+            fi
+          fi
 
       - name: Commit and push
         run: |
