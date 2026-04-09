@@ -1,13 +1,58 @@
 {
   "logs": [
     {
+      "id": 11,
+      "user_id": 3,
+      "username": "officer",
+      "action": "LOGIN",
+      "detail": "Successful login",
+      "ip_address": "::1",
+      "created_at": "2026-04-09 10:53:55"
+    },
+    {
+      "id": 10,
+      "user_id": 1,
+      "username": "admin",
+      "action": "CREATE_USER",
+      "detail": "Created user: officer (officer)",
+      "ip_address": "::1",
+      "created_at": "2026-04-09 10:53:26"
+    },
+    {
+      "id": 9,
+      "user_id": 1,
+      "username": "admin",
+      "action": "CREATE_USER",
+      "detail": "Created user: director (director)",
+      "ip_address": "::1",
+      "created_at": "2026-04-09 10:53:12"
+    },
+    {
+      "id": 8,
+      "user_id": 1,
+      "username": "admin",
+      "action": "LOGIN",
+      "detail": "Successful login",
+      "ip_address": "::1",
+      "created_at": "2026-04-09 10:52:47"
+    },
+    {
+      "id": 7,
+      "user_id": 1,
+      "username": "admin",
+      "action": "PASSWORD_CHANGE",
+      "detail": null,
+      "ip_address": "::1",
+      "created_at": "2026-04-09 10:52:34"
+    },
+    {
       "id": 6,
       "user_id": 1,
       "username": "admin",
       "action": "CREATE_RECORD",
       "detail": "Created record: 2026-04-03 Lunch",
       "ip_address": "::1",
-      "created_at": "2026-04-09 10:49:09"
+      "created_at": "2026-04-09 10:51:01"
     },
     {
       "id": 5,
@@ -16,7 +61,7 @@
       "action": "CREATE_RECORD",
       "detail": "Created record: 2026-04-03 Dinner",
       "ip_address": "::1",
-      "created_at": "2026-04-09 10:49:09"
+      "created_at": "2026-04-09 10:51:01"
     },
     {
       "id": 4,
@@ -25,7 +70,7 @@
       "action": "CREATE_RECORD",
       "detail": "Created record: 2026-04-03 Breakfast",
       "ip_address": "::1",
-      "created_at": "2026-04-09 10:49:08"
+      "created_at": "2026-04-09 10:51:00"
     },
     {
       "id": 3,
@@ -34,7 +79,7 @@
       "action": "CREATE_RECORD",
       "detail": "Created record: 2026-04-04 Lunch",
       "ip_address": "::1",
-      "created_at": "2026-04-09 10:49:08"
+      "created_at": "2026-04-09 10:51:00"
     },
     {
       "id": 2,
@@ -43,7 +88,7 @@
       "action": "CREATE_RECORD",
       "detail": "Created record: 2026-04-04 Dinner",
       "ip_address": "::1",
-      "created_at": "2026-04-09 10:49:08"
+      "created_at": "2026-04-09 10:51:00"
     },
     {
       "id": 1,
@@ -52,7 +97,7 @@
       "action": "CREATE_RECORD",
       "detail": "Created record: 2026-04-04 Breakfast",
       "ip_address": "::1",
-      "created_at": "2026-04-09 10:49:04"
+      "created_at": "2026-04-09 10:51:00"
     }
   ]
 }
