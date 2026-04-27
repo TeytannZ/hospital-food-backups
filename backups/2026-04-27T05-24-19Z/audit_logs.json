@@ -1,0 +1,29 @@
+{
+  "logs": [
+    {
+      "id": 3,
+      "user_id": 1,
+      "username": "admin",
+      "action": "EXPORT_USERS",
+      "detail": "Full user export for backup",
+      "created_at": "2026-04-27 05:24:19"
+    },
+    {
+      "id": 2,
+      "user_id": 1,
+      "username": "admin",
+      "action": "LOGIN",
+      "detail": "Successful login",
+      "created_at": "2026-04-27 05:24:19"
+    },
+    {
+      "id": 1,
+      "user_id": 0,
+      "username": "system",
+      "action": "AUTO_RESTORE",
+      "detail": "Restored from backup: 2026-04-09 — 6 records, 0 users",
+      "created_at": "2026-04-27 05:19:46"
+    }
+  ],
+  "exported_at": "2026-04-27T05:24:20.301Z"
+}
