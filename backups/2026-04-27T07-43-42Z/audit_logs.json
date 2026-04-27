@@ -1,0 +1,21 @@
+{
+  "logs": [
+    {
+      "id": 2,
+      "user_id": 1,
+      "username": "admin",
+      "action": "EXPORT_USERS",
+      "detail": "Full user export for backup",
+      "created_at": "2026-04-27 07:43:42"
+    },
+    {
+      "id": 1,
+      "user_id": 1,
+      "username": "admin",
+      "action": "LOGIN",
+      "detail": "Successful login",
+      "created_at": "2026-04-27 07:43:42"
+    }
+  ],
+  "exported_at": "2026-04-27T07:43:43.163Z"
+}
