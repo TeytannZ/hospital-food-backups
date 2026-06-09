@@ -6,7 +6,7 @@
       "username": "admin",
       "action": "EXPORT_USERS",
       "detail": "Full user export for backup",
-      "created_at": "2026-06-09 20:55:50"
+      "created_at": "2026-06-09 22:17:28"
     },
     {
       "id": 1,
@@ -14,8 +14,8 @@
       "username": "admin",
       "action": "LOGIN",
       "detail": "Successful login",
-      "created_at": "2026-06-09 20:55:50"
+      "created_at": "2026-06-09 22:17:27"
     }
   ],
-  "exported_at": "2026-06-09T20:55:51.720Z"
+  "exported_at": "2026-06-09T22:17:28.468Z"
 }
